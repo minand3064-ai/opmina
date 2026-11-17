@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>opmina — Pieces</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #050505;
+      --text-color: #f2f2f2;
+      --muted-text: #777777;
+      --card-radius: 6px;
+      --mobile-menu-bg: #0a0a0a;
+    }
+
+    body.light-mode {
+      --bg-color: #f7f6f2;
+      --text-color: #1a1a1a;
+      --muted-text: #888888;
+      --mobile-menu-bg: #eeece4;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      min-height: 100vh;
+    }
+
+    /* 상단 헤더 */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background: linear-gradient(to bottom, var(--bg-color) 60%, transparent);
+    }
+
+    .brand-area {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+    }
+
+    .logo {
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-decoration: none;
+      color: var(--text-color);
+    }
+
+    .divider {
+      color: var(--muted-text);
+      font-weight: 300;
+    }
+
+    .active-track-title {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted-text);
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: all 0.35s ease;
+    }
+
+    .active-track-title.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .nav-area {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    /* 상단 메뉴 밑줄 호버 효과 */
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-color);
+      font-size: 13px;
+      font-weight: 400;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      position: relative;
+      padding-bottom: 4px;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background-color: var(--text-color);
+      transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      opacity: 1;
+    }
+
+    .nav-links a:hover::after,
+    .nav-links a.active::after {
+      width: 100%;
+    }
+
+    .theme-toggle {
+      width: 42px;
+      height: 22px;
+      border-radius: 999px;
+      background-color: #1c1c1c;
+      border: 1px solid #333;
+      position: relative;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    body.light-mode .theme-toggle {
+      background-color: #e2e0d8;
+      border-color: #ccc;
+    }
+
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: #555;
+      transition: transform 0.3s ease, background-color 0.3s;
+    }
+
+    body.light-mode .theme-toggle::after {
+      transform: translateX(20px);
+      background-color: #222;
+    }
+
+    /* 모바일/태블릿 햄버거 버튼 */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 24px;
+      height: 16px;
+      padding: 0;
+    }
+
+    .mobile-menu-btn span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background-color: var(--text-color);
+      transition: background-color 0.3s;
+    }
+
+    /* 모바일 슬라이드 사이드바 메뉴 */
+    .mobile-sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.35s ease;
+      z-index: 200;
+    }
+
+    .mobile-sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mobile-sidebar {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 100%;
+      max-width: 320px;
+      height: 100%;
+      background-color: var(--mobile-menu-bg);
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      padding: 40px 30px;
+      transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .mobile-sidebar.active {
+      right: 0;
+    }
+
+    .mobile-close-btn {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 28px;
+      color: var(--text-color);
+      margin-bottom: 50px;
+    }
+
+    .mobile-nav-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .mobile-nav-links a {
+      text-decoration: none;
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--text-color);
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .mobile-nav-links a:hover,
+    .mobile-nav-links a.active {
+      opacity: 1;
+    }
+
+    /* 메인 그리드 */
+    main {
+      padding: 120px 40px 80px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      width: 100%;
+    }
+
+    .piece-card {
+      position: relative;
+      width: 100%;
+      height: 520px;
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      cursor: pointer;
+      background-color: #141414;
+      display: block;
+      text-decoration: none; /* a태그 밑줄 방지 */
+    }
+
+    .piece-card img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: filter 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .piece-card:hover img,
+    .piece-card.playing img {
+      filter: blur(22px) brightness(0.65);
+      transform: scale(1.06);
+    }
+
+    .piece-number {
+      position: absolute;
+      top: 24px;
+      left: 26px;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.85);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .piece-overlay-info {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+      z-index: 10;
+      color: #ffffff;
+    }
+
+    .piece-card:hover .piece-overlay-info,
+    .piece-card.playing .piece-overlay-info {
+      opacity: 1;
+    }
+
+    .piece-title {
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .piece-status {
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 6px 14px;
+      border-radius: 999px;
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 0 20px; }
+      .nav-links { display: none; }
+      .mobile-menu-btn { display: flex; }
+      main { padding: 100px 20px 60px; }
+      .grid-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .piece-card { height: 400px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-area">
+      <a href="index.html" class="logo">opmina</a>
+      <span class="divider">|</span>
+      <span class="active-track-title" id="headerTrackTitle">PIECE TITLE</span>
+    </div>
+
+    <div class="nav-area">
+      <ul class="nav-links">
+        <li><a href="about.html">About</a></li>
+        <li><a href="work.html" class="active">Work</a></li>
+        <li><a href="stories.html">Stories</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <button class="theme-toggle" id="themeToggle" aria-label="테마 전환"></button>
+      <button class="mobile-menu-btn" id="mobileMenuOpen" aria-label="메뉴 열기">
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="mobile-sidebar-overlay" id="mobileOverlay"></div>
+  <nav class="mobile-sidebar" id="mobileSidebar">
+    <button class="mobile-close-btn" id="mobileMenuClose" aria-label="메뉴 닫기">&times;</button>
+    <ul class="mobile-nav-links">
+      <li><a href="about.html">About</a></li>
+      <li><a href="work.html" class="active">Work</a></li>
+      <li><a href="stories.html">Stories</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="grid-container">
+      <!-- 첫 번째 곡 -->
+      <div class="piece-card" data-title="Étude for Ballet" data-audio="track1.mp3">
+        <span class="piece-number">N° — 01</span>
+        <img src="img/piece1.jpeg" alt="Piece 01">
+        <div class="piece-overlay-info">
+          <div class="piece-title">Étude for Ballet</div>
+          <div class="piece-status">CLICK TO PLAY</div>
+        </div>
+      </div>
+
+      <!-- 두 번째 곡 (data-title 추가 완료) -->
+      <a href="cellos-tender-coda.html" class="piece-card" data-title="Cello's Tender Coda">
+        <span class="piece-number">N° — 02</span>
+        <img src="img/piece2.jpeg" alt="Piece 02">
+        <div class="piece-overlay-info">
+          <div class="piece-title">Cello's Tender Coda</div>
+          <div class="piece-status">VIEW DETAIL</div>
+        </div>
+      </a>
+
+      <!-- 세 번째 곡 -->
+      <div class="piece-card" data-title="Cello's Lyrical Dream" data-audio="track3.mp3">
+        <span class="piece-number">N° — 03</span>
+        <img src="img/piece3.jpeg" alt="Piece 03">
+        <div class="piece-overlay-info">
+          <div class="piece-title">Cello's Lyrical Dream</div>
+          <div class="piece-status">CLICK TO PLAY</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <audio id="audioPlayer"></audio>
+
+  <script>
+    // 1. 페이지가 열리자마자 저장된 테마 상태를 적용 (화면 깜박임 방지)
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-mode');
+    }
+
+    // 2. 현재 페이지 파일명을 자동으로 감지하여 네비게이션 active 클래스 동적 부여
+    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+    const navLinks = document.querySelectorAll('.nav-links a, .mobile-nav-links a');
+
+    navLinks.forEach(link => {
+      const linkHref = link.getAttribute('href');
+      if (linkHref === currentPath) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+
+    const cards = document.querySelectorAll('.piece-card');
+    const headerTrackTitle = document.getElementById('headerTrackTitle');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const themeToggle = document.getElementById('themeToggle');
+
+    let currentPlayingCard = null;
+
+    // 3. 테마 토글 버튼 클릭 시 상태를 localStorage에 저장
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        if (document.body.classList.contains('light-mode')) {
+          localStorage.setItem('theme', 'light');
+        } else {
+          localStorage.setItem('theme', 'dark');
+        }
+      });
+    }
+
+    // 4. 모바일 햄버거 메뉴 열기/닫기 로직
+    const mobileMenuOpen = document.getElementById('mobileMenuOpen');
+    const mobileMenuClose = document.getElementById('mobileMenuClose');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+
+    function openMobileMenu() {
+      if (mobileSidebar && mobileOverlay) {
+        mobileSidebar.classList.add('active');
+        mobileOverlay.classList.add('active');
+      }
+    }
+
+    function closeMobileMenu() {
+      if (mobileSidebar && mobileOverlay) {
+        mobileSidebar.classList.remove('active');
+        mobileOverlay.classList.remove('active');
+      }
+    }
+
+    if (mobileMenuOpen) mobileMenuOpen.addEventListener('click', openMobileMenu);
+    if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
+    if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobileMenu);
+
+    // 5. 카드 호버 및 오디오 재생 로직
+    cards.forEach(card => {
+      const title = card.getAttribute('data-title');
+      const audioSrc = card.getAttribute('data-audio');
+      const statusBadge = card.querySelector('.piece-status');
+
+      card.addEventListener('mouseenter', () => {
+        if (title) {
+          headerTrackTitle.textContent = title;
+          headerTrackTitle.classList.add('visible');
+        }
+      });
+
+      card.addEventListener('mouseleave', () => {
+        if (currentPlayingCard) {
+          headerTrackTitle.textContent = currentPlayingCard.getAttribute('data-title');
+        } else {
+          headerTrackTitle.classList.remove('visible');
+        }
+      });
+
+      // 오디오가 있는 카드만 재생 기능 부여 (<a> 태그 상세페이지 이동과 충돌 방지)
+      if (audioSrc) {
+        card.addEventListener('click', () => {
+          if (currentPlayingCard === card && !audioPlayer.paused) {
+            audioPlayer.pause();
+            card.classList.remove('playing');
+            if (statusBadge) statusBadge.textContent = 'CLICK TO PLAY';
+            currentPlayingCard = null;
+          } else {
+            cards.forEach(c => {
+              if (c.getAttribute('data-audio')) {
+                c.classList.remove('playing');
+                const badge = c.querySelector('.piece-status');
+                if (badge) badge.textContent = 'CLICK TO PLAY';
+              }
+            });
+
+            audioPlayer.src = audioSrc;
+            audioPlayer.play().catch(() => {
+              console.log('오디오 파일 경로를 확인해 주세요:', audioSrc);
+            });
+
+            card.classList.add('playing');
+            if (statusBadge) statusBadge.textContent = 'PLAYING... (CLICK TO PAUSE)';
+            currentPlayingCard = card;
+            headerTrackTitle.textContent = title;
+            headerTrackTitle.classList.add('visible');
+          }
+        });
+      }
+    });
+
+    audioPlayer.addEventListener('ended', () => {
+      if (currentPlayingCard) {
+        currentPlayingCard.classList.remove('playing');
+        const badge = currentPlayingCard.querySelector('.piece-status');
+        if (badge) badge.textContent = 'CLICK TO PLAY';
+        currentPlayingCard = null;
+        headerTrackTitle.classList.remove('visible');
+      }
+    });
+  </script>
+</body>
+</html>

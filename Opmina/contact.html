@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>opmina — Contact</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #050505;
+      --text-color: #f2f2f2;
+      --muted-text: #777777;
+      --input-bg: #080808;
+      --border-color: #242424;
+      --btn-bg: #141414;
+      --btn-hover: #222222;
+      --watermark-color: #111111;
+      --mobile-menu-bg: #0a0a0a;
+    }
+
+    body.light-mode {
+      --bg-color: #f7f6f2;
+      --text-color: #1a1a1a;
+      --muted-text: #888888;
+      --input-bg: #f0efe9;
+      --border-color: #d6d4cc;
+      --btn-bg: #e4e2da;
+      --btn-hover: #d8d5cc;
+      --watermark-color: #ebe9e1;
+      --mobile-menu-bg: #eeece4;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background: linear-gradient(to bottom, var(--bg-color) 70%, transparent);
+    }
+
+    .brand-area {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+    }
+
+    .logo {
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-decoration: none;
+      color: var(--text-color);
+    }
+
+    .divider {
+      color: var(--muted-text);
+      font-weight: 300;
+    }
+
+    .nav-area {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-color);
+      font-size: 13px;
+      font-weight: 400;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      position: relative;
+      padding-bottom: 4px;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background-color: var(--text-color);
+      transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      opacity: 1;
+    }
+
+    .nav-links a:hover::after,
+    .nav-links a.active::after {
+      width: 100%;
+    }
+
+    .theme-toggle {
+      width: 42px;
+      height: 22px;
+      border-radius: 999px;
+      background-color: #1c1c1c;
+      border: 1px solid #333;
+      position: relative;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    body.light-mode .theme-toggle {
+      background-color: #e2e0d8;
+      border-color: #ccc;
+    }
+
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: #555;
+      transition: transform 0.3s ease, background-color 0.3s;
+    }
+
+    body.light-mode .theme-toggle::after {
+      transform: translateX(20px);
+      background-color: #222;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 24px;
+      height: 16px;
+      padding: 0;
+    }
+
+    .mobile-menu-btn span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background-color: var(--text-color);
+      transition: background-color 0.3s;
+    }
+
+    .mobile-sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.35s ease;
+      z-index: 200;
+    }
+
+    .mobile-sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mobile-sidebar {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 100%;
+      max-width: 320px;
+      height: 100%;
+      background-color: var(--mobile-menu-bg);
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      padding: 40px 30px;
+      transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .mobile-sidebar.active {
+      right: 0;
+    }
+
+    .mobile-close-btn {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 28px;
+      color: var(--text-color);
+      margin-bottom: 50px;
+    }
+
+    .mobile-nav-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .mobile-nav-links a {
+      text-decoration: none;
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--text-color);
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .mobile-nav-links a:hover,
+    .mobile-nav-links a.active {
+      opacity: 1;
+    }
+
+    main {
+      flex: 1;
+      padding: 200px 40px 100px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .section-row {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 40px;
+      margin-bottom: 120px;
+    }
+
+    .section-label {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--text-color);
+    }
+
+    .info-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .info-content a {
+      color: var(--text-color);
+      text-decoration: none;
+      width: fit-content;
+      transition: opacity 0.2s;
+    }
+
+    .info-content a:hover {
+      opacity: 0.65;
+    }
+
+    .contact-form {
+      max-width: 520px;
+      width: 100%;
+    }
+
+    .form-row-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .form-row-2col .form-group {
+      margin-bottom: 0;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-color);
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 13px 16px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text-color);
+      outline: none;
+      transition: border-color 0.25s;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: #555555;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: #555555;
+    }
+
+    .form-group textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px 24px;
+      border-radius: 999px;
+      background-color: var(--btn-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      font-size: 13px;
+      font-weight: 400;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background-color 0.25s, transform 0.15s;
+    }
+
+    .submit-btn:hover {
+      background-color: var(--btn-hover);
+    }
+
+    .submit-btn:active {
+      transform: scale(0.99);
+    }
+
+    footer {
+      padding: 40px 0 36px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .watermark-wrapper {
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      margin-bottom: 48px;
+      user-select: none;
+    }
+
+    .watermark-track {
+      display: flex;
+      white-space: nowrap;
+      will-change: transform;
+      animation: marqueeFlow 18s linear infinite;
+    }
+
+    .watermark-track span {
+      font-size: clamp(64px, 16.5vw, 250px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 0.85;
+      color: var(--watermark-color);
+      text-transform: uppercase;
+      padding-right: 8vw;
+      transition: color 0.4s ease;
+    }
+
+    @keyframes marqueeFlow {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .footer-bottom {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: 11px;
+      line-height: 1.6;
+      color: var(--muted-text);
+    }
+
+    .footer-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .footer-col.center {
+      text-align: center;
+    }
+
+    .footer-col.right {
+      text-align: right;
+    }
+
+    .footer-bottom a {
+      color: var(--text-color);
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 0 20px; }
+      .nav-links { display: none; }
+      .mobile-menu-btn { display: flex; }
+      main { padding: 130px 20px 60px; }
+      .section-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-bottom: 70px;
+      }
+      .form-row-2col {
+        grid-template-columns: 1fr;
+      }
+      .footer-bottom {
+        padding: 0 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .footer-col.center,
+      .footer-col.right {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-area">
+      <a href="index.html" class="logo">opmina</a>
+      <span class="divider">|</span>
+    </div>
+
+    <div class="nav-area">
+      <ul class="nav-links">
+        <li><a href="about.html">About</a></li>
+        <li><a href="work.html">Work</a></li>
+        <li><a href="stories.html">Stories</a></li>
+        <li><a href="contact.html" class="active">Contact</a></li>
+      </ul>
+      <button class="theme-toggle" id="themeToggle" aria-label="테마 전환"></button>
+      <button class="mobile-menu-btn" id="mobileMenuOpen" aria-label="메뉴 열기">
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="mobile-sidebar-overlay" id="mobileOverlay"></div>
+  <nav class="mobile-sidebar" id="mobileSidebar">
+    <button class="mobile-close-btn" id="mobileMenuClose" aria-label="메뉴 닫기">&times;</button>
+    <ul class="mobile-nav-links">
+      <li><a href="about.html">About</a></li>
+      <li><a href="work.html">Work</a></li>
+      <li><a href="stories.html">Stories</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="section-row">
+      <div class="section-label">Info</div>
+      <div class="info-content">
+        <a href="https://youtube.com/@mina-k3t4d?si=mIgzo5oOR17M7a-d" target="_blank">https://youtube.com/@leemina</a>
+        <a href="mailto:minanc30@naver.com">minanc30@naver.com</a>
+      </div>
+    </section>
+
+    <section class="section-row">
+      <div class="section-label">Contact</div>
+      <form class="contact-form" id="contactForm">
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your full name" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Your email address" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" placeholder="Your message..." required></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Send Message</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <div class="watermark-wrapper">
+      <div class="watermark-track">
+        <span>OPMINA</span>
+        <span>OPMINA</span>
+        <span>OPMINA</span>
+        <span>OPMINA</span>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-col">
+        <span>©2026</span>
+        <span>All rights reserved</span>
+      </div>
+      <div class="footer-col center">
+        <span>Designed &amp; Composed</span>
+        <span>by opmina</span>
+      </div>
+      <div class="footer-col right">
+        <span>Feel free to contact me</span>
+        <a href="mailto:minanc30@naver.com">minanc30@naver.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 1. 페이지가 열리자마자 저장된 테마 상태를 적용 (화면 깜박임 방지)
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-mode');
+    }
+
+    // 2. 현재 페이지 파일명을 자동으로 감지하여 네비게이션 active 클래스 동적 부여
+    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+    const navLinks = document.querySelectorAll('.nav-links a, .mobile-nav-links a');
+
+    navLinks.forEach(link => {
+      const linkHref = link.getAttribute('href');
+      if (linkHref === currentPath) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+
+    const themeToggle = document.getElementById('themeToggle');
+
+    // 3. 테마 토글 버튼 클릭 시 상태를 localStorage에 저장
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        if (document.body.classList.contains('light-mode')) {
+          localStorage.setItem('theme', 'light');
+        } else {
+          localStorage.setItem('theme', 'dark');
+        }
+      });
+    }
+
+    const mobileMenuOpen = document.getElementById('mobileMenuOpen');
+    const mobileMenuClose = document.getElementById('mobileMenuClose');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+
+    function openMobileMenu() {
+      if (mobileSidebar && mobileOverlay) {
+        mobileSidebar.classList.add('active');
+        mobileOverlay.classList.add('active');
+      }
+    }
+
+    function closeMobileMenu() {
+      if (mobileSidebar && mobileOverlay) {
+        mobileSidebar.classList.remove('active');
+        mobileOverlay.classList.remove('active');
+      }
+    }
+
+    if (mobileMenuOpen) mobileMenuOpen.addEventListener('click', openMobileMenu);
+    if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
+    if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobileMenu);
+
+    // 4. Contact 폼 제출 기능
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+      contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const message = document.getElementById('message').value;
+
+        const subject = encodeURIComponent(`[OPMINA Inquiry] from ${name}`);
+        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+
+        window.location.href = `mailto:minanc30@naver.com?subject=${subject}&body=${body}`;
+      });
+    }
+  </script>
+</body>
+</html>
