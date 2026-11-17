@@ -100,7 +100,6 @@
       list-style: none;
     }
 
-    /* 상단 메뉴 밑줄 호버 효과 */
     .nav-links a {
       text-decoration: none;
       color: var(--text-color);
@@ -166,7 +165,6 @@
       background-color: #222;
     }
 
-    /* 모바일/태블릿 햄버거 버튼 */
     .mobile-menu-btn {
       display: none;
       background: none;
@@ -187,7 +185,6 @@
       transition: background-color 0.3s;
     }
 
-    /* 모바일 슬라이드 사이드바 메뉴 */
     .mobile-sidebar-overlay {
       position: fixed;
       inset: 0;
@@ -254,7 +251,6 @@
       opacity: 1;
     }
 
-    /* 메인 그리드 */
     main {
       padding: 120px 40px 80px;
       max-width: 1600px;
@@ -268,6 +264,7 @@
       width: 100%;
     }
 
+    /* 카드 전체를 링크(<a>)로 처리하여 이미지나 카드 아무 곳이나 누르면 상세페이지로 이동 */
     .piece-card {
       position: relative;
       width: 100%;
@@ -277,7 +274,7 @@
       cursor: pointer;
       background-color: #141414;
       display: block;
-      text-decoration: none; /* a태그 밑줄 방지 */
+      text-decoration: none;
     }
 
     .piece-card img {
@@ -292,8 +289,7 @@
                   transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .piece-card:hover img,
-    .piece-card.playing img {
+    .piece-card:hover img {
       filter: blur(22px) brightness(0.65);
       transform: scale(1.06);
     }
@@ -325,8 +321,7 @@
       color: #ffffff;
     }
 
-    .piece-card:hover .piece-overlay-info,
-    .piece-card.playing .piece-overlay-info {
+    .piece-card:hover .piece-overlay-info {
       opacity: 1;
     }
 
@@ -358,6 +353,9 @@
         gap: 20px;
       }
       .piece-card { height: 400px; }
+      .piece-title { font-size: 14px; letter-spacing: 1.5px; }
+      .piece-status { font-size: 9px; letter-spacing: 1.5px; padding: 5px 10px; }
+      .piece-number { font-size: 11px; top: 20px; left: 20px; }
     }
   </style>
 </head>
@@ -398,17 +396,17 @@
 
   <main>
     <div class="grid-container">
-      <!-- 첫 번째 곡 -->
-      <div class="piece-card" data-title="Étude for Ballet" data-audio="track1.mp3">
+      <!-- 첫 번째 곡 카드 (클릭 시 1번 상세 페이지로 이동) -->
+      <a href="etude-for-ballet.html" class="piece-card" data-title="Étude for Ballet">
         <span class="piece-number">N° — 01</span>
         <img src="img/piece1.jpeg" alt="Piece 01">
         <div class="piece-overlay-info">
           <div class="piece-title">Étude for Ballet</div>
-          <div class="piece-status">CLICK TO PLAY</div>
+          <div class="piece-status">VIEW DETAIL</div>
         </div>
-      </div>
+      </a>
 
-      <!-- 두 번째 곡 (data-title 추가 완료) -->
+      <!-- 두 번째 곡 카드 (클릭 시 2번 상세 페이지로 이동) -->
       <a href="cellos-tender-coda.html" class="piece-card" data-title="Cello's Tender Coda">
         <span class="piece-number">N° — 02</span>
         <img src="img/piece2.jpeg" alt="Piece 02">
@@ -418,28 +416,24 @@
         </div>
       </a>
 
-      <!-- 세 번째 곡 -->
-      <div class="piece-card" data-title="Cello's Lyrical Dream" data-audio="track3.mp3">
+      <!-- 세 번째 곡 카드 (클릭 시 3번 상세 페이지로 이동) -->
+      <a href="cellos-lyrical-dream.html" class="piece-card" data-title="Cello's Lyrical Dream">
         <span class="piece-number">N° — 03</span>
         <img src="img/piece3.jpeg" alt="Piece 03">
         <div class="piece-overlay-info">
           <div class="piece-title">Cello's Lyrical Dream</div>
-          <div class="piece-status">CLICK TO PLAY</div>
+          <div class="piece-status">VIEW DETAIL</div>
         </div>
-      </div>
+      </a>
     </div>
   </main>
 
-  <audio id="audioPlayer"></audio>
-
   <script>
-    // 1. 페이지가 열리자마자 저장된 테마 상태를 적용 (화면 깜박임 방지)
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') {
       document.body.classList.add('light-mode');
     }
 
-    // 2. 현재 페이지 파일명을 자동으로 감지하여 네비게이션 active 클래스 동적 부여
     const currentPath = window.location.pathname.split('/').pop() || 'index.html';
     const navLinks = document.querySelectorAll('.nav-links a, .mobile-nav-links a');
 
@@ -454,12 +448,8 @@
 
     const cards = document.querySelectorAll('.piece-card');
     const headerTrackTitle = document.getElementById('headerTrackTitle');
-    const audioPlayer = document.getElementById('audioPlayer');
     const themeToggle = document.getElementById('themeToggle');
 
-    let currentPlayingCard = null;
-
-    // 3. 테마 토글 버튼 클릭 시 상태를 localStorage에 저장
     if (themeToggle) {
       themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('light-mode');
@@ -471,7 +461,6 @@
       });
     }
 
-    // 4. 모바일 햄버거 메뉴 열기/닫기 로직
     const mobileMenuOpen = document.getElementById('mobileMenuOpen');
     const mobileMenuClose = document.getElementById('mobileMenuClose');
     const mobileSidebar = document.getElementById('mobileSidebar');
@@ -495,11 +484,8 @@
     if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
     if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobileMenu);
 
-    // 5. 카드 호버 및 오디오 재생 로직
     cards.forEach(card => {
       const title = card.getAttribute('data-title');
-      const audioSrc = card.getAttribute('data-audio');
-      const statusBadge = card.querySelector('.piece-status');
 
       card.addEventListener('mouseenter', () => {
         if (title) {
@@ -509,53 +495,8 @@
       });
 
       card.addEventListener('mouseleave', () => {
-        if (currentPlayingCard) {
-          headerTrackTitle.textContent = currentPlayingCard.getAttribute('data-title');
-        } else {
-          headerTrackTitle.classList.remove('visible');
-        }
-      });
-
-      // 오디오가 있는 카드만 재생 기능 부여 (<a> 태그 상세페이지 이동과 충돌 방지)
-      if (audioSrc) {
-        card.addEventListener('click', () => {
-          if (currentPlayingCard === card && !audioPlayer.paused) {
-            audioPlayer.pause();
-            card.classList.remove('playing');
-            if (statusBadge) statusBadge.textContent = 'CLICK TO PLAY';
-            currentPlayingCard = null;
-          } else {
-            cards.forEach(c => {
-              if (c.getAttribute('data-audio')) {
-                c.classList.remove('playing');
-                const badge = c.querySelector('.piece-status');
-                if (badge) badge.textContent = 'CLICK TO PLAY';
-              }
-            });
-
-            audioPlayer.src = audioSrc;
-            audioPlayer.play().catch(() => {
-              console.log('오디오 파일 경로를 확인해 주세요:', audioSrc);
-            });
-
-            card.classList.add('playing');
-            if (statusBadge) statusBadge.textContent = 'PLAYING... (CLICK TO PAUSE)';
-            currentPlayingCard = card;
-            headerTrackTitle.textContent = title;
-            headerTrackTitle.classList.add('visible');
-          }
-        });
-      }
-    });
-
-    audioPlayer.addEventListener('ended', () => {
-      if (currentPlayingCard) {
-        currentPlayingCard.classList.remove('playing');
-        const badge = currentPlayingCard.querySelector('.piece-status');
-        if (badge) badge.textContent = 'CLICK TO PLAY';
-        currentPlayingCard = null;
         headerTrackTitle.classList.remove('visible');
-      }
+      });
     });
   </script>
 </body>

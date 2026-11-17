@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>opmina — Pieces</title>
+  <title>opmina — Work</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <style>
     :root {
@@ -51,7 +52,7 @@
       justify-content: space-between;
       align-items: center;
       z-index: 100;
-      background: linear-gradient(to bottom, var(--bg-color) 60%, transparent);
+      background: linear-gradient(to bottom, var(--bg-color) 65%, transparent);
     }
 
     .brand-area {
@@ -252,71 +253,85 @@
       opacity: 1;
     }
 
-    /* 첫 화면 (Hero 섹션) */
-    .hero-section {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 0 20px;
-    }
-
-    .hero-line-top {
-      width: 1px;
-      height: 60px;
+    /* 스크롤 진행도 인디케이터 (상단 얇은 라인) */
+    .scroll-progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
       background-color: var(--text-color);
-      opacity: 0.4;
-      margin-bottom: 40px;
-    }
-
-    .hero-text {
-      font-size: clamp(20px, 3vw, 36px);
-      font-weight: 300;
-      letter-spacing: -0.01em;
-      line-height: 1.4;
-      max-width: 800px;
-      opacity: 0.9;
-    }
-
-    .hero-line-bottom-wrapper {
-      margin-top: 50px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .hero-line-bottom {
-      width: 1px;
-      height: 80px;
-      background-color: var(--text-color);
-      opacity: 0.4;
-      margin-bottom: 12px;
-    }
-
-    .hero-dot {
-      width: 8px;
-      height: 8px;
-      border: 1px solid var(--text-color);
-      border-radius: 50%;
       opacity: 0.6;
+      z-index: 150;
     }
 
-    /* Recent Work 섹션 */
+    /* 우측 미니 섹션 퀵 네비게이션 도트 */
+    .side-scroll-nav {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 90;
+    }
+
+    .side-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--muted-text);
+      opacity: 0.4;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .side-dot.active,
+    .side-dot:hover {
+      opacity: 1;
+      background-color: var(--text-color);
+      transform: scale(1.4);
+    }
+
+    /* Work 영역 전체 컨테이너 (상단 텍스트 없이 바로 시작) */
     main {
-      padding: 60px 40px 100px;
+      padding: 130px 40px 120px;
       max-width: 1600px;
       margin: 0 auto;
     }
 
-    .section-title {
-      font-size: 16px;
+    /* 각 분야별 섹션 */
+    .work-category-section {
+      margin-bottom: 110px;
+    }
+
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 14px;
+      margin-bottom: 28px;
+    }
+
+    body.light-mode .category-header {
+      border-bottom-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .category-title {
+      font-size: 14px;
       font-weight: 400;
-      letter-spacing: 1.5px;
+      letter-spacing: 2.5px;
       text-transform: uppercase;
-      margin-bottom: 32px;
       color: var(--text-color);
+      opacity: 0.85;
+    }
+
+    .category-count {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: var(--muted-text);
     }
 
     .grid-container {
@@ -326,6 +341,26 @@
       width: 100%;
     }
 
+    /* 빈 섹션 플레이스홀더 */
+    .empty-slot {
+      height: 220px;
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      border-radius: var(--card-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--muted-text);
+      opacity: 0.6;
+    }
+
+    body.light-mode .empty-slot {
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+
+    /* 카드 스타일 및 제이쿼리 등장 애니메이션 초기값 */
     .piece-card {
       position: relative;
       width: 100%;
@@ -335,6 +370,9 @@
       cursor: pointer;
       background-color: #141414;
       display: block;
+      text-decoration: none;
+      opacity: 0;
+      transform: translateY(35px);
     }
 
     .piece-card img {
@@ -346,11 +384,10 @@
       object-fit: cover;
       display: block;
       transition: filter 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-                  transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+                  transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .piece-card:hover img,
-    .piece-card.playing img {
+    .piece-card:hover img {
       filter: blur(22px) brightness(0.65);
       transform: scale(1.06);
     }
@@ -382,8 +419,7 @@
       color: #ffffff;
     }
 
-    .piece-card:hover .piece-overlay-info,
-    .piece-card.playing .piece-overlay-info {
+    .piece-card:hover .piece-overlay-info {
       opacity: 1;
     }
 
@@ -409,17 +445,28 @@
       header { padding: 0 20px; }
       .nav-links { display: none; }
       .mobile-menu-btn { display: flex; }
-      main { padding: 40px 20px 60px; }
+      .side-scroll-nav { display: none; }
+      main { padding: 110px 20px 60px; }
       .grid-container {
         grid-template-columns: 1fr;
         gap: 20px;
       }
       .piece-card { height: 400px; }
-      .hero-text { font-size: 18px; padding: 0 10px; }
+      .work-category-section { margin-bottom: 70px; }
     }
   </style>
 </head>
 <body>
+
+  <!-- 상단 스크롤 게이지 -->
+  <div class="scroll-progress-bar" id="scrollProgress"></div>
+
+  <!-- 우측 섹션 이동 도트 -->
+  <div class="side-scroll-nav">
+    <div class="side-dot active" data-target="#sec-classical" title="Romantic Classical"></div>
+    <div class="side-dot" data-target="#sec-pop" title="Pop Songs"></div>
+    <div class="side-dot" data-target="#sec-game" title="Game Soundtracks"></div>
+  </div>
 
   <header>
     <div class="brand-area">
@@ -454,63 +501,72 @@
     </ul>
   </nav>
 
-  <!-- 첫 화면 (낭만주의 음악 소개 문구 섹션) -->
-  <section class="hero-section">
-    <div class="hero-line-top"></div>
-    <div class="hero-text">Handcrafted Romantic musical pieces, composed with emotion</div>
-    <div class="hero-line-bottom-wrapper">
-      <div class="hero-line-bottom"></div>
-      <div class="hero-dot"></div>
-    </div>
-  </section>
-
-  <!-- Recent Work 섹션 -->
+  <!-- Work 영역: 텍스트 섹션 없이 바로 시작 -->
   <main>
-    <h2 class="section-title">Recent Work</h2>
-    <div class="grid-container">
-      <!-- 첫 번째 곡 -->
-      <div class="piece-card" data-title="Étude for Ballet" data-audio="track1.mp3">
-        <span class="piece-number">N° — 01</span>
-        <img src="img/piece1.jpeg" alt="Piece 01">
-        <div class="piece-overlay-info">
-          <div class="piece-title">Étude for Ballet</div>
-          <div class="piece-status">CLICK TO PLAY</div>
-        </div>
+    
+    <!-- 1. 낭만주의 클래식 섹션 -->
+    <section class="work-category-section" id="sec-classical">
+      <div class="category-header">
+        <h2 class="category-title">Romantic Classical</h2>
+        <span class="category-count">03 PIECES</span>
       </div>
+      <div class="grid-container">
+        <a href="etude-for-ballet.html" class="piece-card" data-title="Étude for Ballet">
+          <span class="piece-number">N° — 01</span>
+          <img src="img/piece1.jpeg" alt="Piece 01">
+          <div class="piece-overlay-info">
+            <div class="piece-title">Étude for Ballet</div>
+            <div class="piece-status">VIEW DETAIL</div>
+          </div>
+        </a>
 
-      <!-- 두 번째 곡 -->
-      <div class="piece-card" data-title="Cello's Tender Coda" data-audio="track2.mp3">
-        <span class="piece-number">N° — 02</span>
-        <img src="img/piece2.jpeg" alt="Piece 02">
-        <div class="piece-overlay-info">
-          <div class="piece-title">Cello's Tender Coda</div>
-          <div class="piece-status">CLICK TO PLAY</div>
-        </div>
-      </div>
+        <a href="cellos-tender-coda.html" class="piece-card" data-title="Cello's Tender Coda">
+          <span class="piece-number">N° — 02</span>
+          <img src="img/piece2.jpeg" alt="Piece 02">
+          <div class="piece-overlay-info">
+            <div class="piece-title">Cello's Tender Coda</div>
+            <div class="piece-status">VIEW DETAIL</div>
+          </div>
+        </a>
 
-      <!-- 세 번째 곡 -->
-      <div class="piece-card" data-title="Cello's Lyrical Dream" data-audio="track3.mp3">
-        <span class="piece-number">N° — 03</span>
-        <img src="img/piece3.jpeg" alt="Piece 03">
-        <div class="piece-overlay-info">
-          <div class="piece-title">Cello's Lyrical Dream</div>
-          <div class="piece-status">CLICK TO PLAY</div>
-        </div>
+        <a href="cellos-lyrical-dream.html" class="piece-card" data-title="Cello's Lyrical Dream">
+          <span class="piece-number">N° — 03</span>
+          <img src="img/piece3.jpeg" alt="Piece 03">
+          <div class="piece-overlay-info">
+            <div class="piece-title">Cello's Lyrical Dream</div>
+            <div class="piece-status">VIEW DETAIL</div>
+          </div>
+        </a>
       </div>
-    </div>
+    </section>
+
+    <!-- 2. 팝송 섹션 -->
+    <section class="work-category-section" id="sec-pop">
+      <div class="category-header">
+        <h2 class="category-title">Pop Songs</h2>
+        <span class="category-count">ARCHIVE</span>
+      </div>
+      <div class="empty-slot">COMING SOON</div>
+    </section>
+
+    <!-- 3. 게임 음악 섹션 -->
+    <section class="work-category-section" id="sec-game">
+      <div class="category-header">
+        <h2 class="category-title">Game Soundtracks</h2>
+        <span class="category-count">ARCHIVE</span>
+      </div>
+      <div class="empty-slot">COMING SOON</div>
+    </section>
+
   </main>
 
-  <audio id="audioPlayer"></audio>
-
   <script>
-    // 1. 페이지가 열리자마자 저장된 테마 상태를 적용 (화면 깜박임 방지)
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') {
       document.body.classList.add('light-mode');
     }
 
-    // 2. 현재 페이지 파일명을 자동으로 감지하여 네비게이션 active 클래스 동적 부여
-    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+    const currentPath = window.location.pathname.split('/').pop() || 'work.html';
     const navLinks = document.querySelectorAll('.nav-links a, .mobile-nav-links a');
 
     navLinks.forEach(link => {
@@ -522,14 +578,7 @@
       }
     });
 
-    const cards = document.querySelectorAll('.piece-card');
-    const headerTrackTitle = document.getElementById('headerTrackTitle');
-    const audioPlayer = document.getElementById('audioPlayer');
     const themeToggle = document.getElementById('themeToggle');
-
-    let currentPlayingCard = null;
-
-    // 3. 테마 토글 버튼 클릭 시 상태를 localStorage에 저장
     if (themeToggle) {
       themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('light-mode');
@@ -564,67 +613,89 @@
     if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
     if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobileMenu);
 
-    // 4. 카드 호버 및 오디오 재생 로직
+    const cards = document.querySelectorAll('.piece-card');
+    const headerTrackTitle = document.getElementById('headerTrackTitle');
+
     cards.forEach(card => {
       const title = card.getAttribute('data-title');
-      const audioSrc = card.getAttribute('data-audio');
-      const statusBadge = card.querySelector('.piece-status');
 
       card.addEventListener('mouseenter', () => {
-        if (title) {
+        if (title && headerTrackTitle) {
           headerTrackTitle.textContent = title;
           headerTrackTitle.classList.add('visible');
         }
       });
 
       card.addEventListener('mouseleave', () => {
-        if (currentPlayingCard) {
-          headerTrackTitle.textContent = currentPlayingCard.getAttribute('data-title');
-        } else {
+        if (headerTrackTitle) {
           headerTrackTitle.classList.remove('visible');
         }
       });
+    });
 
-      // 오디오가 있는 카드만 재생 기능 부여 (<a> 태그 상세페이지 이동과 충돌 방지)
-      if (audioSrc) {
-        card.addEventListener('click', () => {
-          if (currentPlayingCard === card && !audioPlayer.paused) {
-            audioPlayer.pause();
-            card.classList.remove('playing');
-            if (statusBadge) statusBadge.textContent = 'CLICK TO PLAY';
-            currentPlayingCard = null;
-          } else {
-            cards.forEach(c => {
-              if (c.getAttribute('data-audio')) {
-                c.classList.remove('playing');
-                const badge = c.querySelector('.piece-status');
-                if (badge) badge.textContent = 'CLICK TO PLAY';
-              }
+    // 제이쿼리 기반 인터랙션 (카드 순차 등장 + 스크롤 리빌 + 우측 도트 이동 + 페이지 전환)
+    $(document).ready(function() {
+      // 1. 카드 순차적 페이드 & 슬라이드 업 등장
+      function revealCards() {
+        const windowBottom = $(window).scrollTop() + $(window).height();
+
+        $('.piece-card').each(function(index) {
+          const cardTop = $(this).offset().top;
+          if (cardTop < windowBottom - 40 && !$(this).hasClass('revealed')) {
+            $(this).addClass('revealed');
+            const delayTime = (index % 2) * 140;
+            $(this).delay(delayTime).animate({ opacity: 1 }, {
+              step: function(now) {
+                const y = 35 * (1 - now);
+                $(this).css('transform', 'translateY(' + y + 'px)');
+              },
+              duration: 650
             });
-
-            audioPlayer.src = audioSrc;
-            audioPlayer.play().catch(() => {
-              console.log('오디오 파일 경로를 확인해 주세요:', audioSrc);
-            });
-
-            card.classList.add('playing');
-            if (statusBadge) statusBadge.textContent = 'PLAYING... (CLICK TO PAUSE)';
-            currentPlayingCard = card;
-            headerTrackTitle.textContent = title;
-            headerTrackTitle.classList.add('visible');
           }
         });
       }
-    });
 
-    audioPlayer.addEventListener('ended', () => {
-      if (currentPlayingCard) {
-        currentPlayingCard.classList.remove('playing');
-        const badge = currentPlayingCard.querySelector('.piece-status');
-        if (badge) badge.textContent = 'CLICK TO PLAY';
-        currentPlayingCard = null;
-        headerTrackTitle.classList.remove('visible');
-      }
+      revealCards();
+
+      // 2. 스크롤 진행 바 & 우측 네비게이션 도트 활성화
+      $(window).on('scroll', function() {
+        revealCards();
+
+        const scrollTop = $(window).scrollTop();
+        const docHeight = $(document).height() - $(window).height();
+        const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        $('#scrollProgress').css('width', scrollPercent + '%');
+
+        // 현재 보고 있는 섹션 체크
+        $('.work-category-section').each(function(idx) {
+          const top = $(this).offset().top - 250;
+          const bottom = top + $(this).outerHeight();
+          if (scrollTop >= top && scrollTop < bottom) {
+            $('.side-dot').removeClass('active');
+            $('.side-dot').eq(idx).addClass('active');
+          }
+        });
+      });
+
+      // 3. 우측 도트 클릭 시 해당 카테고리로 부드럽게 스크롤 이동
+      $('.side-dot').on('click', function() {
+        const targetId = $(this).data('target');
+        const targetOffset = $(targetId).offset().top - 110;
+        $('html, body').stop().animate({
+          scrollTop: targetOffset
+        }, 650);
+      });
+
+      // 4. 카드 클릭 시 페이드아웃 후 상세 페이지 이동
+      $('.piece-card').on('click', function(e) {
+        const targetUrl = $(this).attr('href');
+        if (targetUrl) {
+          e.preventDefault();
+          $('body').stop().animate({ opacity: 0 }, 350, function() {
+            window.location.href = targetUrl;
+          });
+        }
+      });
     });
   </script>
 </body>

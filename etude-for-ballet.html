@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>opmina — Étude for Ballet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #050505;
+      --text-color: #f2f2f2;
+      --muted-text: #777777;
+      --mobile-menu-bg: #0a0a0a;
+    }
+
+    body.light-mode {
+      --bg-color: #f7f6f2;
+      --text-color: #1a1a1a;
+      --muted-text: #888888;
+      --mobile-menu-bg: #eeece4;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      min-height: 100vh;
+      opacity: 0;
+    }
+
+    header {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 80px;
+      padding: 0 40px;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 100;
+      background: linear-gradient(to bottom, var(--bg-color) 65%, transparent);
+    }
+
+    .brand-area { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+    .logo { font-weight: 500; letter-spacing: 1.5px; text-decoration: none; color: var(--text-color); }
+    .back-link { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted-text); text-decoration: none; transition: color 0.2s; }
+    .back-link:hover { color: var(--text-color); }
+
+    .nav-area { display: flex; align-items: center; gap: 28px; }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--text-color); font-size: 13px; font-weight: 400; opacity: 0.7; transition: opacity 0.2s; position: relative; padding-bottom: 4px; }
+    .nav-links a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 1px; background-color: var(--text-color); transition: width 0.3s; }
+    .nav-links a:hover, .nav-links a.active { opacity: 1; }
+    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+    .theme-toggle { width: 42px; height: 22px; border-radius: 999px; background-color: #1c1c1c; border: 1px solid #333; position: relative; cursor: pointer; }
+    body.light-mode .theme-toggle { background-color: #e2e0d8; border-color: #ccc; }
+    .theme-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background-color: #555; transition: transform 0.3s; }
+    body.light-mode .theme-toggle::after { transform: translateX(20px); background-color: #222; }
+
+    main {
+      padding: 130px 40px 120px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* PC에서 가로로 넓찍하고 여유 있는 앨범 이미지 비율 */
+    .detail-img-wrapper {
+      width: 100%;
+      height: 560px;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 40px;
+      background-color: #141414;
+    }
+
+    .detail-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 챔버 및 번호 정보 */
+    .detail-sub-info {
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted-text);
+      margin-bottom: 12px;
+    }
+
+    /* 곡 타이틀 */
+    .detail-title {
+      font-size: 34px;
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 35px;
+      line-height: 1.2;
+    }
+
+    /* 연도 & 플레이 버튼 영역 */
+    .detail-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 35px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    body.light-mode .detail-meta-row {
+      border-bottom-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .meta-item label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted-text);
+      text-transform: uppercase;
+    }
+
+    .meta-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 75px;
+      height: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      background: transparent;
+      color: var(--text-color);
+    }
+
+    body.light-mode .meta-badge {
+      border-color: rgba(0, 0, 0, 0.25);
+    }
+
+    .play-btn {
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .play-btn:hover {
+      background-color: var(--text-color);
+      color: var(--bg-color);
+      border-color: var(--text-color);
+    }
+
+    /* 맨 아래 곡 설명 텍스트 */
+    .detail-description {
+      font-size: 15px;
+      font-weight: 300;
+      line-height: 1.85;
+      letter-spacing: 0.2px;
+      opacity: 0.85;
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 0 20px; }
+      .nav-links { display: none; }
+      main { padding: 100px 20px 60px; }
+      .detail-img-wrapper { height: 320px; }
+      .detail-title { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-area">
+      <a href="work.html" class="logo">opmina</a>
+      <span class="divider" style="color:var(--muted-text); font-weight:300;">|</span>
+      <a href="work.html" class="back-link">&larr; Back to Pieces</a>
+    </div>
+
+    <div class="nav-area">
+      <ul class="nav-links">
+        <li><a href="about.html">About</a></li>
+        <li><a href="work.html" class="active">Work</a></li>
+        <li><a href="stories.html">Stories</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <button class="theme-toggle" id="themeToggle"></button>
+    </div>
+  </header>
+
+  <main>
+    <div class="detail-img-wrapper">
+      <img src="img/piece1.jpeg" alt="Étude for Ballet">
+    </div>
+
+    <div class="detail-sub-info">N° — 01 · CHAMBER</div>
+    <h1 class="detail-title">Étude for Ballet</h1>
+
+    <div class="detail-meta-row">
+      <div class="meta-item">
+        <label>Year</label>
+        <div class="meta-badge">2026</div>
+      </div>
+      <div class="meta-item">
+        <label>Listen</label>
+        <div class="meta-badge play-btn" id="playBtn">PLAY</div>
+      </div>
+    </div>
+
+    <div class="detail-description">
+European Romantic ballet orchestral instrumental, relaxed, unhurried waltz sway; full, dense strings with lyrical woodwinds, warm horns, and shifting chromatic harmonies beneath a deliberately monotonous melody; no vocals; focused, spacious orchestral mix, unfolding over ten minutes and resolving firmly to the tonic minor.    </div>
+
+    <audio id="myAudio" src="mp3/etude for ballet.mp3"></audio>
+  </main>
+
+  <script>
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') document.body.classList.add('light-mode');
+
+    $('#themeToggle').on('click', () => {
+      $('body').toggleClass('light-mode');
+      localStorage.setItem('theme', $('body').hasClass('light-mode') ? 'light' : 'dark');
+    });
+
+    $(document).ready(function() {
+      // 페이지 진입 시 부드러운 페이드인
+      $('body').animate({ opacity: 1 }, 450);
+
+      const audio = document.getElementById('myAudio');
+      const $playBtn = $('#playBtn');
+
+      // PLAY 버튼 클릭 시 재생/정지 토글
+      $playBtn.on('click', function() {
+        if (audio.paused) {
+          // 다른 곡이 재생 중일 수 있으니 안전하게 실행
+          audio.play().then(() => {
+            $playBtn.text('PAUSE');
+          }).catch(error => {
+            console.log("오디오 재생 실패 (음원 파일 경로를 확인해주세요):", error);
+            alert("음원 파일(mp3) 경로를 다시 한번 확인해 주세요!");
+          });
+        } else {
+          audio.pause();
+          $playBtn.text('PLAY');
+        }
+      });
+
+      // 음원이 끝까지 재생되었을 때 버튼 글자 원복
+      audio.onended = function() {
+        $playBtn.text('PLAY');
+      };
+    });
+  </script>
+</body>
+</html>

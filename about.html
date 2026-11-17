@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>opmina — About</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <!-- 제이쿼리 CDN -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #050505;
+      --text-color: #f2f2f2;
+      --muted-text: #777777;
+    }
+    body.light-mode {
+      --bg-color: #f7f6f2;
+      --text-color: #1a1a1a;
+      --muted-text: #888888;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+    header {
+      width: 100%;
+      height: 80px;
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-decoration: none;
+      color: var(--text-color);
+      font-size: 14px;
+    }
+    .back-link {
+      text-decoration: none;
+      color: var(--muted-text);
+      font-size: 13px;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--text-color); }
+    
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+      width: 100%;
+    }
+
+    /* 위에서 아래로 스르륵 내려오는 애니메이션 적용 구역 */
+    .animate-content {
+      opacity: 0;
+      transform: translateY(-25px);
+    }
+
+  .about-img {
+      width: 100%;
+      height: auto; /* 세로 고정을 풀고 원본 비율 그대로 나오게 설정 */
+      object-fit: contain; /* 이미지가 잘리지 않고 전체가 다 보이도록 설정 */
+      border-radius: 6px;
+      margin-bottom: 40px;
+    }
+
+    
+    .about-meta {
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: var(--muted-text);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .about-title {
+      font-size: 28px;
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 30px;
+    }
+
+    .about-desc {
+      font-size: 15px;
+      line-height: 1.8;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.85);
+      letter-spacing: 0.5px;
+    }
+
+    body.light-mode .about-desc { color: rgba(0, 0, 0, 0.8); }
+
+    @media (max-width: 768px) {
+      header { padding: 0 20px; }
+      main { padding: 20px 20px 60px; }
+      .about-img { height: 320px; }
+      .about-title { font-size: 22px; }
+      .about-desc { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="logo">opmina</a>
+    <a href="index.html" class="back-link">&#8592; BACK TO HOME</a>
+  </header>
+
+  <main>
+    <div class="animate-content">
+      <!-- 사진 파일명이 다를 경우 src를 확인해 주세요 (기본: img/me.jpeg 또는 me.jpeg) -->
+      <img src="img/me.jpg" alt="Mina" class="about-img">
+      <div class="about-meta">Profile &bull; opmina</div>
+      <h1 class="about-title">Mina</h1>
+      <!-- <p class="about-desc">
+        Classical composition background, exploring the intersection of sound, branding, and visual aesthetics. Curating atmospheres through delicate melodies and thoughtful spaces.
+      </p> -->
+    </div>
+  </main>
+
+  <script>
+    $(document).ready(function() {
+      // 페이지 진입 시 사진과 글자가 위에서 아래로 부드럽게 스르륵 내려오는 애니메이션
+      $('.animate-content').stop().animate({
+        opacity: 1
+      }, {
+        step: function(now) {
+          let moveY = -25 * (1 - now);
+          $(this).css('transform', 'translateY(' + moveY + 'px)');
+        },
+        duration: 700,
+        easing: 'swing'
+      });
+    });
+  </script>
+</body>
+</html>
