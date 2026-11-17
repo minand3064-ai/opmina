@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>opmina — Cello's Tender Coda</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #050505;
+      --text-color: #f2f2f2;
+      --muted-text: #777777;
+      --border-color: #222222;
+      --mobile-menu-bg: #0a0a0a;
+    }
+
+    body.light-mode {
+      --bg-color: #f7f6f2;
+      --text-color: #1a1a1a;
+      --muted-text: #888888;
+      --border-color: #d6d4cc;
+      --mobile-menu-bg: #eeece4;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 상단 헤더 */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background: linear-gradient(to bottom, var(--bg-color) 70%, transparent);
+    }
+
+    .brand-area {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+    }
+
+    .logo {
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-decoration: none;
+      color: var(--text-color);
+    }
+
+    .divider {
+      color: var(--muted-text);
+      font-weight: 300;
+    }
+
+    .nav-area {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-color);
+      font-size: 13px;
+      font-weight: 400;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      position: relative;
+      padding-bottom: 4px;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background-color: var(--text-color);
+      transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      opacity: 1;
+    }
+
+    .nav-links a:hover::after,
+    .nav-links a.active::after {
+      width: 100%;
+    }
+
+    .theme-toggle {
+      width: 42px;
+      height: 22px;
+      border-radius: 999px;
+      background-color: #1c1c1c;
+      border: 1px solid #333;
+      position: relative;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    body.light-mode .theme-toggle {
+      background-color: #e2e0d8;
+      border-color: #ccc;
+    }
+
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: #555;
+      transition: transform 0.3s ease, background-color 0.3s;
+    }
+
+    body.light-mode .theme-toggle::after {
+      transform: translateX(20px);
+      background-color: #222;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 24px;
+      height: 16px;
+      padding: 0;
+    }
+
+    .mobile-menu-btn span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background-color: var(--text-color);
+      transition: background-color 0.3s;
+    }
+
+    .mobile-sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.35s ease;
+      z-index: 200;
+    }
+
+    .mobile-sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mobile-sidebar {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 100%;
+      max-width: 320px;
+      height: 100%;
+      background-color: var(--mobile-menu-bg);
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      padding: 40px 30px;
+      transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .mobile-sidebar.active {
+      right: 0;
+    }
+
+    .mobile-close-btn {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 28px;
+      color: var(--text-color);
+      margin-bottom: 50px;
+    }
+
+    .mobile-nav-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .mobile-nav-links a {
+      text-decoration: none;
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--text-color);
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .mobile-nav-links a:hover,
+    .mobile-nav-links a.active {
+      opacity: 1;
+    }
+
+    /* 상세 페이지 레이아웃 */
+    main {
+      flex: 1;
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 160px 40px 100px;
+    }
+
+    /* 위에서 아래로 부드럽게 내려오는 애니메이션 정의 */
+    .fade-down-el {
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .fade-down-el.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* 상단 타이틀 영역 */
+    .top-info-section {
+      margin-bottom: 50px;
+    }
+
+    .track-number {
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      color: var(--muted-text);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .detail-title {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+
+    .track-service {
+      font-size: 13px;
+      color: var(--muted-text);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* 앨범 이미지 영역 */
+    .album-image-container {
+      width: 100%;
+      height: 650px;
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: #141414;
+      margin-bottom: 80px;
+    }
+
+    .album-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* 상세 설명 및 메타 정보 영역 */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 60px;
+      align-items: start;
+      padding-top: 40px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .meta-column {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .meta-item label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted-text);
+      margin-bottom: 8px;
+    }
+
+    /* YEAR 박스 디자인을 LISTEN 버튼과 통일감 있게 맞춤 */
+    .year-badge {
+      display: inline-block;
+      border: 1px solid var(--text-color);
+      color: var(--text-color);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    .audio-player-box {
+      margin-top: 4px;
+    }
+
+    .play-btn {
+      background: none;
+      border: 1px solid var(--text-color);
+      color: var(--text-color);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: inherit;
+    }
+
+    .play-btn:hover {
+      background-color: var(--text-color);
+      color: var(--bg-color);
+    }
+
+    .description-column {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text-color);
+      opacity: 0.85;
+      max-width: 800px;
+      white-space: pre-line;
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 0 20px; }
+      .nav-links { display: none; }
+      .mobile-menu-btn { display: flex; }
+      main { padding: 120px 20px 60px; }
+      .album-image-container { height: 380px; margin-bottom: 50px; }
+      .detail-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .meta-column {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-area">
+      <a href="index.html" class="logo">opmina</a>
+      <span class="divider">|</span>
+    </div>
+
+    <div class="nav-area">
+      <ul class="nav-links">
+        <li><a href="about.html">About</a></li>
+        <li><a href="work.html">Work</a></li>
+        <li><a href="stories.html">Stories</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <button class="theme-toggle" id="themeToggle" aria-label="테마 전환"></button>
+      <button class="mobile-menu-btn" id="mobileMenuOpen" aria-label="메뉴 열기">
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="mobile-sidebar-overlay" id="mobileOverlay"></div>
+  <nav class="mobile-sidebar" id="mobileSidebar">
+    <button class="mobile-close-btn" id="mobileMenuClose" aria-label="메뉴 닫기">&times;</button>
+    <ul class="mobile-nav-links">
+      <li><a href="about.html">About</a></li>
+      <li><a href="work.html">Work</a></li>
+      <li><a href="stories.html">Stories</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <!-- 상단 타이틀 영역 (위에서 아래로 내려오는 애니메이션 적용) -->
+    <div class="top-info-section fade-down-el">
+      <div class="track-number">N° — 02</div>
+      <h1 class="detail-title">Cello's Tender Coda</h1>
+      <div class="track-service">Branding</div>
+    </div>
+
+    <!-- 대형 앨범 이미지 (img/piece2.jpeg) -->
+    <div class="album-image-container fade-down-el" style="transition-delay: 0.15s;">
+      <img src="img/piece2.jpeg" alt="Cello's Tender Coda Album Art">
+    </div>
+
+    <!-- 상세 정보 및 설명 영역 -->
+    <div class="detail-grid fade-down-el" style="transition-delay: 0.3s;">
+      <div class="meta-column">
+        <div class="meta-item">
+          <label>Year</label>
+          <div class="year-badge">2026</div>
+        </div>
+        
+        <div class="meta-item audio-player-box">
+          <label>Listen</label>
+          <button class="play-btn" id="playBtn">PLAY</button>
+          <audio id="audioPlayer" src="mp3/Cello's Tender Coda.mp3"></audio>
+        </div>
+      </div>
+
+      <div class="description-column">
+Late Romantic symphony, F major, purely acoustic nineteenth-century orchestra, expressive solo cello carrying a clear and unforgettable main melody, lush legato violins answering and widening the theme, rich chromatic harmony, poetic emotional phrasing, measured symphonic pulse, Begin with a restrained orchestral introduction, bring the cello forward over warm lower strings, build into a broad violin-led restatement with woodwind and brass support, then return to the cello for a tender, resolved coda, Natural concert-hall acoustics, detailed orchestral balance, dynamic and sweeping classical arrangement
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // 1. 테마 유지 (로컬 스토리지)
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-mode');
+    }
+
+    // 2. 네비게이션 active 감지
+    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+    const navLinks = document.querySelectorAll('.nav-links a, .mobile-nav-links a');
+
+    navLinks.forEach(link => {
+      if (link.getAttribute('href') === currentPath) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        if (document.body.classList.contains('light-mode')) {
+          localStorage.setItem('theme', 'light');
+        } else {
+          localStorage.setItem('theme', 'dark');
+        }
+      });
+    }
+
+    // 3. 모바일 메뉴
+    const mobileMenuOpen = document.getElementById('mobileMenuOpen');
+    const mobileMenuClose = document.getElementById('mobileMenuClose');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+
+    function openMobileMenu() {
+      if (mobileSidebar && mobileOverlay) {
+        mobileSidebar.classList.add('active');
+        mobileOverlay.classList.add('active');
+      }
+    }
+
+    function closeMobileMenu() {
+      if (mobileSidebar && mobileOverlay) {
+        mobileSidebar.classList.remove('active');
+        mobileOverlay.classList.remove('active');
+      }
+    }
+
+    if (mobileMenuOpen) mobileMenuOpen.addEventListener('click', openMobileMenu);
+    if (mobileMenuClose) mobileMenuClose.addEventListener('click', openMobileMenu); // 수정
+    if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobileMenu);
+    if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
+
+    // 4. 페이지 로드 시 위에서 아래로 내려오는 애니메이션 실행 (부드러운 페이드인)
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const elements = document.querySelectorAll('.fade-down-el');
+        elements.forEach(el => el.classList.add('active'));
+      }, 50);
+    });
+
+    // 5. 오디오 플레이어 버튼 제어
+    const playBtn = document.getElementById('playBtn');
+    const audioPlayer = document.getElementById('audioPlayer');
+
+    if (playBtn && audioPlayer) {
+      playBtn.addEventListener('click', () => {
+        if (audioPlayer.paused) {
+          audioPlayer.play().then(() => {
+            playBtn.textContent = 'PAUSE';
+          }).catch(err => {
+            console.log('오디오 재생 실패 (경로를 확인해주세요):', err);
+          });
+        } else {
+          audioPlayer.pause();
+          playBtn.textContent = 'PLAY';
+        }
+      });
+
+      audioPlayer.addEventListener('ended', () => {
+        playBtn.textContent = 'PLAY';
+      });
+    }
+  </script>
+</body>
+</html>
